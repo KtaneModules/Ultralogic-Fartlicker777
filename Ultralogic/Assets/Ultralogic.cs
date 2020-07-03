@@ -23,10 +23,11 @@ public class Ultralogic : MonoBehaviour {
 
     bool[] Funny = {false,false,false};
     int[] Numero = {0,0,0};
-    int[] Whatever = {0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
-    int[] Whatevertwo = {0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
-    int[] Whateverelected = {0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
+    private List<int> Whatever = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
+    private List<int> Whatevertwo = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
+    private List<int> Whateverelected = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
     bool[] AnswerToisAwesome = {false,false,false};
+    bool[] HeyINeedToSetABool = {false, false, false};
     int Aids = 0;
 
     static int moduleIdCounter = 1;
@@ -91,11 +92,19 @@ public class Ultralogic : MonoBehaviour {
     }
 
     void LunaPlaturionPress(KMSelectable LunaPlaturion){
+      Audio.PlaySoundAtTransform("PAAAAAAAAAAAAAAAAAAAAAAAUSE",  LunaPlaturion.transform);
+      LunaPlaturion.AddInteractionPunch();
+      if (moduleSolved == true) {
+        return;
+      }
       for (int i = 0; i < 3; i++) {
         if (LunaPlaturion == OperatorsButClickie[i]) {
           Numero[i] += 1;
           if (Numero[i] == 6) {
             Numero[i] = 0;
+          }
+          if (HeyINeedToSetABool[i] == false) {
+            HeyINeedToSetABool[i] = true;
           }
           if (i == 0) {
             for (int j = 0; j < 6; j++) {
@@ -120,104 +129,355 @@ public class Ultralogic : MonoBehaviour {
     }
 
     void GoosePress() {
+      Goose.AddInteractionPunch();
+      Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Goose.transform);
+      if (moduleSolved == true) {
+        return;
+      }
+      for (int i = 0; i < 3; i++) {
+        if (HeyINeedToSetABool[i] == false) {
+          GetComponent<KMBombModule>().HandleStrike();
+          Debug.LogFormat("[Ultralogic #{0}] An operator was not set. how.", moduleId);
+          return;
+        }
+      }
       switch (Whatever[Numero[0]]) { //AB TO C
         case 0:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to AND.", moduleId);
         if ((Funny[0] == true && Funny[1] == true) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
         case 1:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to NAND.", moduleId);
         if (!(Funny[0] == true && Funny[1] == true) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
         case 2:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to NOR.", moduleId);
         if (!(Funny[0] == true || Funny[1] == true) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
         case 3:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to OR.", moduleId);
         if ((Funny[0] == true || Funny[1] == true) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
         case 4:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to XNOR.", moduleId);
         if (!((Funny[0] == true && Funny[1] == false) || (Funny[0] == false && Funny[1] == true)) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
         case 5:
+        Debug.LogFormat("[Ultralogic #{0}] AB is set to XOR.", moduleId);
         if (((Funny[0] == true && Funny[1] == false) || (Funny[0] == false && Funny[1] == true)) == Funny[2]) {
           AnswerToisAwesome[0] = true;
         }
         break;
       }
-      switch (Whatever[Numero[1]]) { //AC TO B
+      switch (Whatevertwo[Numero[1]]) { //AC TO B
         case 0:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to AND.", moduleId);
         if ((Funny[0] == true && Funny[2] == true) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
         case 1:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to NAND.", moduleId);
         if (!(Funny[0] == true && Funny[2] == true) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
         case 2:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to NOR.", moduleId);
         if (!(Funny[0] == true || Funny[2] == true) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
         case 3:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to OR.", moduleId);
         if ((Funny[0] == true || Funny[2] == true) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
         case 4:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to XNOR.", moduleId);
         if (!((Funny[0] == true && Funny[2] == false) || (Funny[0] == false && Funny[2] == true)) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
         case 5:
+        Debug.LogFormat("[Ultralogic #{0}] AC is set to XOR.", moduleId);
         if (((Funny[0] == true && Funny[2] == false) || (Funny[0] == false && Funny[2] == true)) == Funny[1]) {
           AnswerToisAwesome[1] = true;
         }
         break;
       }
-      switch (Whatever[Numero[2]]) { //BC TO A
+      switch (Whateverelected[Numero[2]]) { //BC TO A
         case 0:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to AND.", moduleId);
         if ((Funny[1] == true && Funny[2] == true) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
         case 1:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to NAND.", moduleId);
         if (!(Funny[1] == true && Funny[2] == true) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
         case 2:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to NOR.", moduleId);
         if (!(Funny[1] == true || Funny[2] == true) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
         case 3:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to OR.", moduleId);
         if ((Funny[1] == true || Funny[2] == true) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
         case 4:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to XNOR.", moduleId);
         if (!((Funny[1] == true && Funny[2] == false) || (Funny[1] == false && Funny[2] == true)) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
         case 5:
+        Debug.LogFormat("[Ultralogic #{0}] BC is set to XOR.", moduleId);
         if (((Funny[1] == true && Funny[2] == false) || (Funny[1] == false && Funny[2] == true)) == Funny[0]) {
           AnswerToisAwesome[2] = true;
         }
         break;
       }
       if (AnswerToisAwesome[0] == true && AnswerToisAwesome[1] == true && AnswerToisAwesome[2] == true) {
+        if (Funny[0] == true) {
+          ABC[0].GetComponent<MeshRenderer>().material = colores[1];
+          ABC[2].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[0].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[2].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[3].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[10].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[0].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[1].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[2].GetComponent<MeshRenderer>().material = colores[1];
+        }
+        else {
+          ABC[0].GetComponent<MeshRenderer>().material = colores[0];
+          ABC[2].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[0].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[2].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[3].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[10].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[0].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[1].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[2].GetComponent<MeshRenderer>().material = colores[0];
+        }
+        if (Funny[1] == true) {
+          ABC[1].GetComponent<MeshRenderer>().material = colores[1];
+          ABC[3].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[1].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[4].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[9].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[7].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[8].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[9].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[10].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[11].GetComponent<MeshRenderer>().material = colores[1];
+        }
+        else {
+          ABC[1].GetComponent<MeshRenderer>().material = colores[0];
+          ABC[3].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[1].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[4].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[9].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[7].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[8].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[9].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[10].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[11].GetComponent<MeshRenderer>().material = colores[0];
+        }
+        if (Funny[2] == true) {
+          BCA[5].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[6].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[7].GetComponent<MeshRenderer>().material = colores[1];
+          BCA[8].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[3].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[4].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[5].GetComponent<MeshRenderer>().material = colores[1];
+          CAB[6].GetComponent<MeshRenderer>().material = colores[1];
+        }
+        else {
+          BCA[5].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[6].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[7].GetComponent<MeshRenderer>().material = colores[0];
+          BCA[8].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[3].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[4].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[5].GetComponent<MeshRenderer>().material = colores[0];
+          CAB[6].GetComponent<MeshRenderer>().material = colores[0];
+        }
+        Audio.PlaySoundAtTransform("BWAAAAH",  Goose.transform);
         GetComponent<KMBombModule>().HandlePass();
+        Debug.LogFormat("[Ultralogic #{0}] All operators are set correctly, module disarmed.", moduleId);
+        moduleSolved = true;
+      }
+      else {
+        GetComponent<KMBombModule>().HandleStrike();
+        Debug.LogFormat("[Ultralogic #{0}] An operator(s) is set incorrectly, strike.", moduleId);
+      }
+    }
+
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use (!{0} set AB/AC/BC AND/OR/XOR/NAND/NOR/XNOR) to set the corresponding operator. Use !{0} submit to submit.";
+    #pragma warning restore 414
+
+    IEnumerator ProcessTwitchCommand(string command){
+      command = command.Trim();
+      string[] parameters = command.Split(' ');
+      if (parameters.Length > 2) {
+        yield return "sendtochaterror Too little commands!";
+        yield break;
+      }
+      if (parameters.Length == 1 && parameters[0].ToString().ToLower() != "submit") {
+        yield return "sendtochaterror Too little commands!";
+        yield break;
+      }
+      if (parameters[0].ToString().ToLower() != "set" && parameters[0].ToString().ToLower() != "submit") {
+        yield return "sendtochaterror Invalid command!";
+        yield break;
+      }
+      else if (parameters[0].ToString().ToLower() == "submit") {
+        GoosePress();
+        yield break;
+      }
+      else if (parameters[1].ToString().ToLower() == "ab" || parameters[1].ToString().ToLower() == "ba") {
+        switch (parameters[2].ToString().ToLower()) {
+          case "and":
+          while (Whatever[Numero[0]] != 0) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nand":
+          while (Whatever[Numero[0]] != 1) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nor":
+          while (Whatever[Numero[0]] != 2) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "or":
+          while (Whatever[Numero[0]] != 3) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xnor":
+          while (Whatever[Numero[0]] != 4) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xor":
+          while (Whatever[Numero[0]] != 5) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+        }
+        yield break;
+      }
+      else if (parameters[1].ToString().ToLower() == "ac" || parameters[1].ToString().ToLower() == "ca") {
+        switch (parameters[2].ToString().ToLower()) {
+          case "and":
+          while (Whatevertwo[Numero[1]] != 0) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nand":
+          while (Whatevertwo[Numero[1]] != 1) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nor":
+          while (Whatevertwo[Numero[1]] != 2) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "or":
+          while (Whatevertwo[Numero[1]] != 3) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xnor":
+          while (Whatevertwo[Numero[1]] != 4) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xor":
+          while (Whatevertwo[Numero[1]] != 5) {
+            OperatorsButClickie[1].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+        }
+        yield break;
+      }
+      else if (parameters[1].ToString().ToLower() == "bc" || parameters[1].ToString().ToLower() == "cb") {
+        switch (parameters[2].ToString().ToLower()) {
+          case "and":
+          while (Whateverelected[Numero[2]] != 0) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nand":
+          while (Whateverelected[Numero[2]] != 1) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "nor":
+          while (Whateverelected[Numero[2]] != 2) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "or":
+          while (Whateverelected[Numero[2]] != 3) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xnor":
+          while (Whateverelected[Numero[2]] != 4) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+          case "xor":
+          while (Whateverelected[Numero[2]] != 5) {
+            OperatorsButClickie[2].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+          }
+          break;
+        }
+        yield break;
       }
     }
 }

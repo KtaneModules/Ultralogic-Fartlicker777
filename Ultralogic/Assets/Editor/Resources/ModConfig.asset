@@ -11,10 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
   m_Name: ModConfig
   m_EditorClassIdentifier: 
-  id: template
-  title: Template
-  author: 
-  description: 
+  id: Ultralogic
+  title: Ultralogic
+  author: Me
+  description: "Wait a \u2588\u2588\u2588\u2588ing second... did we skip Hyperlogic?\r"
   version: 
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: 254ed6caf3b1fe646b78c9af2ac8bb1d, type: 3}
