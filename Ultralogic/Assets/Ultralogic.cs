@@ -134,6 +134,11 @@ public class Ultralogic : MonoBehaviour {
       if (moduleSolved == true) {
         return;
       }
+      if (Whatever[Numero[0]] == Whatevertwo[Numero[1]] || Whatever[Numero[0]] == Whateverelected[Numero[2]] || Whatevertwo[Numero[1]] == Whateverelected[Numero[2]]) {
+        GetComponent<KMBombModule>().HandleStrike();
+        Debug.LogFormat("[Ultralogic #{0}] You cannot have it be the same operator. Strike.", moduleId);
+        return;
+      }
       for (int i = 0; i < 3; i++) {
         if (HeyINeedToSetABool[i] == false) {
           GetComponent<KMBombModule>().HandleStrike();
@@ -340,8 +345,8 @@ public class Ultralogic : MonoBehaviour {
     IEnumerator ProcessTwitchCommand(string command){
       command = command.Trim();
       string[] parameters = command.Split(' ');
-      if (parameters.Length > 2) {
-        yield return "sendtochaterror Too little commands!";
+      if (parameters.Length > 3) {
+        yield return "sendtochaterror Too many commands!";
         yield break;
       }
       if (parameters.Length == 1 && parameters[0].ToString().ToLower() != "submit") {
@@ -477,6 +482,10 @@ public class Ultralogic : MonoBehaviour {
           }
           break;
         }
+        yield break;
+      }
+      else {
+        yield return "sendtochaterror Invalid command!";
         yield break;
       }
     }
