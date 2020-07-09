@@ -364,36 +364,54 @@ public class Ultralogic : MonoBehaviour {
       else if (parameters[1].ToString().ToLower() == "ab" || parameters[1].ToString().ToLower() == "ba") {
         switch (parameters[2].ToString().ToLower()) {
           case "and":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 0) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nand":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 1) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nor":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 2) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "or":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 3) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xnor":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 4) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xor":
+          if (HeyINeedToSetABool[0] == false) {
+            OperatorsButClickie[0].OnInteract();
+          }
           while (Whatever[Numero[0]] != 5) {
             OperatorsButClickie[0].OnInteract();
             yield return new WaitForSeconds(0.1f);
@@ -405,36 +423,54 @@ public class Ultralogic : MonoBehaviour {
       else if (parameters[1].ToString().ToLower() == "ac" || parameters[1].ToString().ToLower() == "ca") {
         switch (parameters[2].ToString().ToLower()) {
           case "and":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 0) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nand":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 1) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nor":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 2) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "or":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 3) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xnor":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 4) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xor":
+          if (HeyINeedToSetABool[1] == false) {
+            OperatorsButClickie[1].OnInteract();
+          }
           while (Whatevertwo[Numero[1]] != 5) {
             OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
@@ -446,36 +482,54 @@ public class Ultralogic : MonoBehaviour {
       else if (parameters[1].ToString().ToLower() == "bc" || parameters[1].ToString().ToLower() == "cb") {
         switch (parameters[2].ToString().ToLower()) {
           case "and":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 0) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nand":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 1) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "nor":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 2) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "or":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 3) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xnor":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 4) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
           }
           break;
           case "xor":
+          if (HeyINeedToSetABool[2] == false) {
+            OperatorsButClickie[2].OnInteract();
+          }
           while (Whateverelected[Numero[2]] != 5) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
