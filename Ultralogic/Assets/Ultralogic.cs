@@ -358,10 +358,12 @@ public class Ultralogic : MonoBehaviour {
         yield break;
       }
       else if (parameters[0].ToString().ToLower() == "submit") {
+        yield return null;
         GoosePress();
         yield break;
       }
       else if (parameters[1].ToString().ToLower() == "ab" || parameters[1].ToString().ToLower() == "ba") {
+        yield return null;
         switch (parameters[2].ToString().ToLower()) {
           case "and":
           if (HeyINeedToSetABool[0] == false) {
@@ -417,10 +419,14 @@ public class Ultralogic : MonoBehaviour {
             yield return new WaitForSeconds(0.1f);
           }
           break;
+          default:
+          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
+          yield break;
         }
         yield break;
       }
       else if (parameters[1].ToString().ToLower() == "ac" || parameters[1].ToString().ToLower() == "ca") {
+        yield return null;
         switch (parameters[2].ToString().ToLower()) {
           case "and":
           if (HeyINeedToSetABool[1] == false) {
@@ -476,10 +482,14 @@ public class Ultralogic : MonoBehaviour {
             yield return new WaitForSeconds(0.1f);
           }
           break;
+          default:
+          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
+          yield break;
         }
         yield break;
       }
       else if (parameters[1].ToString().ToLower() == "bc" || parameters[1].ToString().ToLower() == "cb") {
+        yield return null;
         switch (parameters[2].ToString().ToLower()) {
           case "and":
           if (HeyINeedToSetABool[2] == false) {
@@ -535,6 +545,9 @@ public class Ultralogic : MonoBehaviour {
             yield return new WaitForSeconds(0.1f);
           }
           break;
+          default:
+          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
+          yield break;
         }
         yield break;
       }
