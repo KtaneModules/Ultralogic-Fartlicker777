@@ -1,559 +1,352 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
+using rnd = UnityEngine.Random;
 
 public class Ultralogic : MonoBehaviour {
 
-    public KMBombInfo Bomb;
-    public KMAudio Audio;
-    public KMSelectable Goose;
-    public GameObject[] ABC;
-    public GameObject[] BCA;
-    public GameObject[] CAB;
-    public GameObject[] ABCBlocks;
-    public GameObject[] ABOperators;
-    public GameObject[] ACOperators;
-    public GameObject[] BCOperators;
-    public KMSelectable[] OperatorsButClickie;
-    public Material[] colores;
+   public KMBombInfo Bomb;
+   public KMAudio Audio;
+   public KMSelectable Goose;
+   public GameObject[] ABCBlocks;
+   public GameObject[] ACOperators;
+   public GameObject[] BCOperators;
+   public KMSelectable[] OperatorsButClickie;
+   public Material[] colores;
 
-    bool[] Funny = {false,false,false};
-    int[] Numero = {0,0,0};
-    private List<int> Whatever = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
-    private List<int> Whatevertwo = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
-    private List<int> Whateverelected = new List<int>{0,1,2,3,4,5}; //AND NAND NOR OR XNOR XOR
-    bool[] AnswerToisAwesome = {false,false,false};
-    bool[] HeyINeedToSetABool = {false, false, false};
-    int Aids = 0;
+   public SpriteRenderer[] Operators;
+   public Sprite[] OperatorSprites;
 
-    static int moduleIdCounter = 1;
-    int moduleId;
-    private bool moduleSolved;
+   public GameObject[] AConnectors;
+   public GameObject[] BConnectors;
+   public GameObject[] CConnectors;
 
-    void Awake () {
-        moduleId = moduleIdCounter++;
-        Goose.OnInteract += delegate () { GoosePress(); return false; };
-        foreach (KMSelectable LunaPlaturion in OperatorsButClickie) {
-            LunaPlaturion.OnInteract += delegate () { LunaPlaturionPress(LunaPlaturion); return false; };
-        }
-    }
+   private List<int> TMOperators = new List<int> { 0, 1, 2, 3, 4, 5 };        //AND NAND NOR OR XNOR XOR
+   private List<int> BLOperators = new List<int> { 0, 1, 2, 3, 4, 5 };        //AND NAND NOR OR XNOR XOR
+   private List<int> BROperators = new List<int> { 0, 1, 2, 3, 4, 5 };        //AND NAND NOR OR XNOR XOR
+   int[] OperatorTrackers = new int[3];
 
-    void Start () {
-      Aids = UnityEngine.Random.Range(0,8);
-      for (int i = 0; i < 3; i++) {
-        ABCBlocks[i].GetComponent<MeshRenderer>().material = colores[0];
+   bool[] ABCTruthValues = new bool[3];
+   bool[] StatementValidities = new bool[3];
+
+   static int moduleIdCounter = 1;
+   int moduleId;
+   private bool moduleSolved;
+
+   void Awake () {
+      moduleId = moduleIdCounter++;
+      Goose.OnInteract += delegate () { SubmitPress(); return false; };
+      foreach (KMSelectable OperatorButton in OperatorsButClickie) {
+         OperatorButton.OnInteract += delegate () { OperatorButtonPress(OperatorButton); return false; };
       }
-      switch (Aids) {
-        case 0:
-        Funny[0] = true;
-        break;
-        case 1:
-        Funny[1] = true;
-        break;
-        case 2:
-        Funny[2] = true;
-        break;
-        case 3:
-        Funny[0] = true;
-        Funny[1] = true;
-        break;
-        case 4:
-        Funny[0] = true;
-        Funny[2] = true;
-        break;
-        case 5:
-        Funny[1] = true;
-        Funny[2] = true;
-        break;
-        case 6:
-        Funny[0] = true;
-        Funny[1] = true;
-        Funny[2] = true;
-        break;
-        case 7:
-        Funny[0] = false;
-        Funny[1] = false;
-        Funny[2] = false;
-        break;
+   }
+
+   void Start () {
+      TMOperators.Shuffle();
+      BLOperators.Shuffle();
+      BROperators.Shuffle();
+      for (int i = 0; i < 3; i++) {
+         ABCTruthValues[i] = rnd.Range(0, 2) == 1;
+         if (ABCTruthValues[i]) {
+            ABCBlocks[i].GetComponent<MeshRenderer>().material = colores[1];
+         }
+         OperatorTrackers[i] = rnd.Range(0, 6);
+         switch (i) {
+            case 0: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[TMOperators[OperatorTrackers[i]]]; break;
+            case 1: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[BLOperators[OperatorTrackers[i]]]; break;
+            case 2: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[BROperators[OperatorTrackers[i]]]; break;
+         }
+      }
+      Debug.LogFormat("[Ultralogic #{0}] The truth values are {1}, {2}, {3}.", moduleId, ABCTruthValues[0], ABCTruthValues[1], ABCTruthValues[2]);
+   }
+
+   void OperatorButtonPress (KMSelectable OperatorButton) {
+      OperatorButton.AddInteractionPunch();
+      Audio.PlaySoundAtTransform("PAAAAAAAAAAAAAAAAAAAAAAAUSE", OperatorButton.transform);
+      if (moduleSolved) {
+         return;
       }
       for (int i = 0; i < 3; i++) {
-        if (Funny[i] == true) {
-          ABCBlocks[i].GetComponent<MeshRenderer>().material = colores[1];
-        }
+         if (OperatorButton == OperatorsButClickie[i]) {
+            OperatorTrackers[i] = (OperatorTrackers[i] + 1) % 6;
+            switch (i) {
+               case 0: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[TMOperators[OperatorTrackers[i]]]; break;
+               case 1: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[BLOperators[OperatorTrackers[i]]]; break;
+               case 2: Operators[i].GetComponent<SpriteRenderer>().sprite = OperatorSprites[BROperators[OperatorTrackers[i]]]; break;
+            }
+         }
       }
-      Whatever.Shuffle();
-      Whatevertwo.Shuffle();
-      Whateverelected.Shuffle();
-      Debug.LogFormat("[Ultralogic #{0}] The truth values are {1}, {2}, {3}.", moduleId, Funny[0], Funny[1], Funny[2]);
-    }
+   }
 
-    void LunaPlaturionPress(KMSelectable LunaPlaturion){
-      Audio.PlaySoundAtTransform("PAAAAAAAAAAAAAAAAAAAAAAAUSE",  LunaPlaturion.transform);
-      LunaPlaturion.AddInteractionPunch();
-      if (moduleSolved == true) {
-        return;
-      }
-      for (int i = 0; i < 3; i++) {
-        if (LunaPlaturion == OperatorsButClickie[i]) {
-          Numero[i] += 1;
-          if (Numero[i] == 6) {
-            Numero[i] = 0;
-          }
-          if (HeyINeedToSetABool[i] == false) {
-            HeyINeedToSetABool[i] = true;
-          }
-          if (i == 0) {
-            for (int j = 0; j < 6; j++) {
-              ABOperators[j].gameObject.SetActive(false);
-            }
-            ABOperators[Whatever[Numero[0]]].gameObject.SetActive(true);
-          }
-          else if (i == 1) {
-            for (int j = 0; j < 6; j++) {
-              ACOperators[j].gameObject.SetActive(false);
-            }
-            ACOperators[Whatevertwo[Numero[1]]].gameObject.SetActive(true);
-          }
-          else if (i == 2) {
-            for (int j = 0; j < 6; j++) {
-              BCOperators[j].gameObject.SetActive(false);
-            }
-            BCOperators[Whateverelected[Numero[2]]].gameObject.SetActive(true);
-          }
-        }
-      }
-    }
-
-    void GoosePress() {
+   void SubmitPress () {
       Goose.AddInteractionPunch();
       Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Goose.transform);
-      if (moduleSolved == true) {
-        return;
+      if (moduleSolved) {
+         return;
       }
-      if (Whatever[Numero[0]] == Whatevertwo[Numero[1]] || Whatever[Numero[0]] == Whateverelected[Numero[2]] || Whatevertwo[Numero[1]] == Whateverelected[Numero[2]]) {
-        GetComponent<KMBombModule>().HandleStrike();
-        Debug.LogFormat("[Ultralogic #{0}] You cannot have it be the same operator. Strike.", moduleId);
-        return;
+      if (TMOperators[OperatorTrackers[0]] == BLOperators[OperatorTrackers[1]] || TMOperators[OperatorTrackers[0]] == BROperators[OperatorTrackers[2]] || BLOperators[OperatorTrackers[1]] == BROperators[OperatorTrackers[2]]) {
+         GetComponent<KMBombModule>().HandleStrike();
+         Debug.LogFormat("[Ultralogic #{0}] You cannot have it be the same operator. Strike.", moduleId);
+         return;
       }
-      for (int i = 0; i < 3; i++) {
-        if (HeyINeedToSetABool[i] == false) {
-          GetComponent<KMBombModule>().HandleStrike();
-          Debug.LogFormat("[Ultralogic #{0}] An operator was not set. how.", moduleId);
-          return;
-        }
+      string Type = "";
+      switch (TMOperators[OperatorTrackers[0]]) { //AB TO C
+         case 0:
+            Type = "AND";
+            break;
+         case 1:
+            Type = "NAND";
+            break;
+         case 2:
+            Type = "NOR";
+            break;
+         case 3:
+            Type = "OR";
+            break;
+         case 4:
+            Type = "XNOR";
+            break;
+         case 5:
+            Type = "XOR";
+            break;
       }
-      switch (Whatever[Numero[0]]) { //AB TO C
-        case 0:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to AND.", moduleId);
-        if ((Funny[0] == true && Funny[1] == true) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
-        case 1:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to NAND.", moduleId);
-        if (!(Funny[0] == true && Funny[1] == true) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
-        case 2:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to NOR.", moduleId);
-        if (!(Funny[0] == true || Funny[1] == true) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
-        case 3:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to OR.", moduleId);
-        if ((Funny[0] == true || Funny[1] == true) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
-        case 4:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to XNOR.", moduleId);
-        if (!((Funny[0] == true && Funny[1] == false) || (Funny[0] == false && Funny[1] == true)) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
-        case 5:
-        Debug.LogFormat("[Ultralogic #{0}] AB is set to XOR.", moduleId);
-        if (((Funny[0] == true && Funny[1] == false) || (Funny[0] == false && Funny[1] == true)) == Funny[2]) {
-          AnswerToisAwesome[0] = true;
-        }
-        break;
+      Debug.LogFormat("[Ultralogic #{0}] AB is set to {1}.", moduleId, Type);
+      StatementValidities[0] = CalculateValidities(ABCTruthValues[0], ABCTruthValues[1], Type) == ABCTruthValues[2];
+      switch (BLOperators[OperatorTrackers[1]]) { //AC TO B
+         case 0:
+            Type = "AND";
+            break;
+         case 1:
+            Type = "NAND";
+            break;
+         case 2:
+            Type = "NOR";
+            break;
+         case 3:
+            Type = "OR";
+            break;
+         case 4:
+            Type = "XNOR";
+            break;
+         case 5:
+            Type = "XOR";
+            break;
       }
-      switch (Whatevertwo[Numero[1]]) { //AC TO B
-        case 0:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to AND.", moduleId);
-        if ((Funny[0] == true && Funny[2] == true) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
-        case 1:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to NAND.", moduleId);
-        if (!(Funny[0] == true && Funny[2] == true) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
-        case 2:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to NOR.", moduleId);
-        if (!(Funny[0] == true || Funny[2] == true) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
-        case 3:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to OR.", moduleId);
-        if ((Funny[0] == true || Funny[2] == true) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
-        case 4:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to XNOR.", moduleId);
-        if (!((Funny[0] == true && Funny[2] == false) || (Funny[0] == false && Funny[2] == true)) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
-        case 5:
-        Debug.LogFormat("[Ultralogic #{0}] AC is set to XOR.", moduleId);
-        if (((Funny[0] == true && Funny[2] == false) || (Funny[0] == false && Funny[2] == true)) == Funny[1]) {
-          AnswerToisAwesome[1] = true;
-        }
-        break;
+      Debug.LogFormat("[Ultralogic #{0}] AC is set to {1}.", moduleId, Type);
+      StatementValidities[1] = CalculateValidities(ABCTruthValues[0], ABCTruthValues[2], Type) == ABCTruthValues[1];
+      switch (BROperators[OperatorTrackers[2]]) { //BC TO A
+         case 0:
+            Type = "AND";
+            break;
+         case 1:
+            Type = "NAND";
+            break;
+         case 2:
+            Type = "NOR";
+            break;
+         case 3:
+            Type = "OR";
+            break;
+         case 4:
+            Type = "XNOR";
+            break;
+         case 5:
+            Type = "XOR";
+            break;
       }
-      switch (Whateverelected[Numero[2]]) { //BC TO A
-        case 0:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to AND.", moduleId);
-        if ((Funny[1] == true && Funny[2] == true) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-        case 1:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to NAND.", moduleId);
-        if (!(Funny[1] == true && Funny[2] == true) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-        case 2:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to NOR.", moduleId);
-        if (!(Funny[1] == true || Funny[2] == true) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-        case 3:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to OR.", moduleId);
-        if ((Funny[1] == true || Funny[2] == true) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-        case 4:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to XNOR.", moduleId);
-        if (!((Funny[1] == true && Funny[2] == false) || (Funny[1] == false && Funny[2] == true)) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-        case 5:
-        Debug.LogFormat("[Ultralogic #{0}] BC is set to XOR.", moduleId);
-        if (((Funny[1] == true && Funny[2] == false) || (Funny[1] == false && Funny[2] == true)) == Funny[0]) {
-          AnswerToisAwesome[2] = true;
-        }
-        break;
-      }
-      if (AnswerToisAwesome[0] == true && AnswerToisAwesome[1] == true && AnswerToisAwesome[2] == true) {
-        if (Funny[0] == true) {
-          ABC[0].GetComponent<MeshRenderer>().material = colores[1];
-          ABC[2].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[0].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[2].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[3].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[10].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[0].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[1].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[2].GetComponent<MeshRenderer>().material = colores[1];
-        }
-        else {
-          ABC[0].GetComponent<MeshRenderer>().material = colores[0];
-          ABC[2].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[0].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[2].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[3].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[10].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[0].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[1].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[2].GetComponent<MeshRenderer>().material = colores[0];
-        }
-        if (Funny[1] == true) {
-          ABC[1].GetComponent<MeshRenderer>().material = colores[1];
-          ABC[3].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[1].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[4].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[9].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[7].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[8].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[9].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[10].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[11].GetComponent<MeshRenderer>().material = colores[1];
-        }
-        else {
-          ABC[1].GetComponent<MeshRenderer>().material = colores[0];
-          ABC[3].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[1].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[4].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[9].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[7].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[8].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[9].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[10].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[11].GetComponent<MeshRenderer>().material = colores[0];
-        }
-        if (Funny[2] == true) {
-          BCA[5].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[6].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[7].GetComponent<MeshRenderer>().material = colores[1];
-          BCA[8].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[3].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[4].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[5].GetComponent<MeshRenderer>().material = colores[1];
-          CAB[6].GetComponent<MeshRenderer>().material = colores[1];
-        }
-        else {
-          BCA[5].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[6].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[7].GetComponent<MeshRenderer>().material = colores[0];
-          BCA[8].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[3].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[4].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[5].GetComponent<MeshRenderer>().material = colores[0];
-          CAB[6].GetComponent<MeshRenderer>().material = colores[0];
-        }
-        Audio.PlaySoundAtTransform("BWAAAAH",  Goose.transform);
-        GetComponent<KMBombModule>().HandlePass();
-        Debug.LogFormat("[Ultralogic #{0}] All operators are set correctly, module disarmed.", moduleId);
-        moduleSolved = true;
+      Debug.LogFormat("[Ultralogic #{0}] BC is set to {1}.", moduleId, Type);
+      StatementValidities[2] = CalculateValidities(ABCTruthValues[1], ABCTruthValues[2], Type) == ABCTruthValues[0];
+      if (StatementValidities[0] && StatementValidities[1] && StatementValidities[2]) {
+         if (ABCTruthValues[0]) {
+            for (int i = 0; i < AConnectors.Length; i++) {
+               AConnectors[i].GetComponent<MeshRenderer>().material = colores[1];
+            }
+         }
+         else {
+            for (int i = 0; i < AConnectors.Length; i++) {
+               AConnectors[i].GetComponent<MeshRenderer>().material = colores[0];
+            }
+         }
+         if (ABCTruthValues[1]) {
+            for (int i = 0; i < BConnectors.Length; i++) {
+               BConnectors[i].GetComponent<MeshRenderer>().material = colores[1];
+            }
+         }
+         else {
+            for (int i = 0; i < BConnectors.Length; i++) {
+               BConnectors[i].GetComponent<MeshRenderer>().material = colores[0];
+            }
+         }
+         if (ABCTruthValues[2]) {
+            for (int i = 0; i < CConnectors.Length; i++) {
+               CConnectors[i].GetComponent<MeshRenderer>().material = colores[1];
+            }
+         }
+         else {
+            for (int i = 0; i < CConnectors.Length; i++) {
+               CConnectors[i].GetComponent<MeshRenderer>().material = colores[0];
+            }
+         }
+         GetComponent<KMBombModule>().HandlePass();
+         Debug.LogFormat("[Ultralogic #{0}] All operators are set correctly, module disarmed.", moduleId);
+         moduleSolved = true;
       }
       else {
-        GetComponent<KMBombModule>().HandleStrike();
-        Debug.LogFormat("[Ultralogic #{0}] An operator(s) is set incorrectly, strike.", moduleId);
+         GetComponent<KMBombModule>().HandleStrike();
+         Debug.LogFormat("[Ultralogic #{0}] An operator(s) is set incorrectly, strike.", moduleId);
       }
-    }
+   }
 
-    #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use (!{0} set AB/AC/BC AND/OR/XOR/NAND/NOR/XNOR) to set the corresponding operator. Use !{0} submit to submit.";
-    #pragma warning restore 414
+   bool CalculateValidities (bool First, bool Second, string Type) {
+      switch (Type) {
+         case "AND":
+            return First & Second;
+         case "NAND":
+            return !(First & Second);
+         case "OR":
+            return First | Second;
+         case "NOR":
+            return !(First | Second);
+         case "XOR":
+            return First ^ Second;
+         case "XNOR":
+            return !(First ^ Second);
+         default:
+            return true;
+      }
+   }
 
-    IEnumerator ProcessTwitchCommand(string command){
-      command = command.Trim();
+#pragma warning disable 414
+   private readonly string TwitchHelpMessage = @"Use (!{0} set AB/AC/BC AND/OR/XOR/NAND/NOR/XNOR) to set the corresponding operator. Use !{0} submit to submit.";
+#pragma warning restore 414
+
+   IEnumerator ProcessTwitchCommand (string command) {
+      command = command.ToLower().Trim();
       string[] parameters = command.Split(' ');
-      if (parameters.Length > 3) {
-        yield return "sendtochaterror Too many commands!";
-        yield break;
+      string[] OperatorList = { "and", "nand", "nor", "or", "xnor", "xor" };
+      yield return null;
+      if (parameters.Length > 3 || (parameters.Length == 1 && parameters[0] != "submit")) {
+         yield return "sendtochaterror I don't understand!";
+         yield break;
       }
-      if (parameters.Length == 1 && parameters[0].ToString().ToLower() != "submit") {
-        yield return "sendtochaterror Too little commands!";
-        yield break;
+      if (parameters[0] != "set" && parameters[0] != "submit") {
+         yield return "sendtochaterror I don't understand!";
+         yield break;
       }
-      if (parameters[0].ToString().ToLower() != "set" && parameters[0].ToString().ToLower() != "submit") {
-        yield return "sendtochaterror Invalid command!";
-        yield break;
+      if (parameters[0] == "submit") {
+         SubmitPress();
       }
-      else if (parameters[0].ToString().ToLower() == "submit") {
-        yield return null;
-        GoosePress();
-        yield break;
+      else if (parameters[1] == "ab" || parameters[1] == "ba") {
+         while (TMOperators[OperatorTrackers[0]] != Array.IndexOf(OperatorList, parameters[2])) {
+            OperatorsButClickie[0].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+         }
       }
-      else if (parameters[1].ToString().ToLower() == "ab" || parameters[1].ToString().ToLower() == "ba") {
-        yield return null;
-        switch (parameters[2].ToString().ToLower()) {
-          case "and":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 0) {
-            OperatorsButClickie[0].OnInteract();
+      else if (parameters[1] == "ac" || parameters[1] == "ca") {
+         while (BLOperators[OperatorTrackers[1]] != Array.IndexOf(OperatorList, parameters[2])) {
+            OperatorsButClickie[1].OnInteract();
             yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nand":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 1) {
-            OperatorsButClickie[0].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nor":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 2) {
-            OperatorsButClickie[0].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "or":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 3) {
-            OperatorsButClickie[0].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xnor":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 4) {
-            OperatorsButClickie[0].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xor":
-          if (HeyINeedToSetABool[0] == false) {
-            OperatorsButClickie[0].OnInteract();
-          }
-          while (Whatever[Numero[0]] != 5) {
-            OperatorsButClickie[0].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          default:
-          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
-          yield break;
-        }
-        yield break;
+         }
       }
-      else if (parameters[1].ToString().ToLower() == "ac" || parameters[1].ToString().ToLower() == "ca") {
-        yield return null;
-        switch (parameters[2].ToString().ToLower()) {
-          case "and":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 0) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nand":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 1) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nor":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 2) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "or":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 3) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xnor":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 4) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xor":
-          if (HeyINeedToSetABool[1] == false) {
-            OperatorsButClickie[1].OnInteract();
-          }
-          while (Whatevertwo[Numero[1]] != 5) {
-            OperatorsButClickie[1].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          default:
-          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
-          yield break;
-        }
-        yield break;
-      }
-      else if (parameters[1].ToString().ToLower() == "bc" || parameters[1].ToString().ToLower() == "cb") {
-        yield return null;
-        switch (parameters[2].ToString().ToLower()) {
-          case "and":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 0) {
+      else if (parameters[1] == "bc" || parameters[1] == "cb") {
+         while (BROperators[OperatorTrackers[2]] != Array.IndexOf(OperatorList, parameters[2])) {
             OperatorsButClickie[2].OnInteract();
             yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nand":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 1) {
-            OperatorsButClickie[2].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "nor":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 2) {
-            OperatorsButClickie[2].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "or":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 3) {
-            OperatorsButClickie[2].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xnor":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 4) {
-            OperatorsButClickie[2].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          case "xor":
-          if (HeyINeedToSetABool[2] == false) {
-            OperatorsButClickie[2].OnInteract();
-          }
-          while (Whateverelected[Numero[2]] != 5) {
-            OperatorsButClickie[2].OnInteract();
-            yield return new WaitForSeconds(0.1f);
-          }
-          break;
-          default:
-          yield return "sendtochaterror Invalid logic gate: " + parameters[2];
-          yield break;
-        }
-        yield break;
+         }
       }
       else {
-        yield return "sendtochaterror Invalid command!";
-        yield break;
+         yield return "sendtochaterror Invalid command!";
+         yield break;
       }
-    }
+   }
+
+   IEnumerator TwitchHandleForcedSolve () {
+      string Type = "";
+      bool Reroll = true;
+      while (Reroll) {
+         OperatorsButClickie[0].OnInteract();
+         switch (TMOperators[OperatorTrackers[0]]) { //AB TO C
+            case 0:
+               Type = "AND";
+               break;
+            case 1:
+               Type = "NAND";
+               break;
+            case 2:
+               Type = "NOR";
+               break;
+            case 3:
+               Type = "OR";
+               break;
+            case 4:
+               Type = "XNOR";
+               break;
+            case 5:
+               Type = "XOR";
+               break;
+         }
+         if (CalculateValidities(ABCTruthValues[0], ABCTruthValues[1], Type) == ABCTruthValues[2]) {
+            Reroll = false;
+         }
+         yield return new WaitForSecondsRealtime(.1f);
+      }
+      Reroll = true;
+      while (Reroll) {
+         OperatorsButClickie[1].OnInteract();
+         switch (BLOperators[OperatorTrackers[1]]) {
+            case 0:
+               Type = "AND";
+               break;
+            case 1:
+               Type = "NAND";
+               break;
+            case 2:
+               Type = "NOR";
+               break;
+            case 3:
+               Type = "OR";
+               break;
+            case 4:
+               Type = "XNOR";
+               break;
+            case 5:
+               Type = "XOR";
+               break;
+         }
+         if (CalculateValidities(ABCTruthValues[0], ABCTruthValues[2], Type) == ABCTruthValues[1] && TMOperators[OperatorTrackers[0]] != BLOperators[OperatorTrackers[1]]) {
+            Reroll = false;
+         }
+         yield return new WaitForSecondsRealtime(.1f);
+      }
+      Reroll = true;
+      while (Reroll) {
+         OperatorsButClickie[2].OnInteract();
+         switch (BROperators[OperatorTrackers[2]]) { //BC TO A
+            case 0:
+               Type = "AND";
+               break;
+            case 1:
+               Type = "NAND";
+               break;
+            case 2:
+               Type = "NOR";
+               break;
+            case 3:
+               Type = "OR";
+               break;
+            case 4:
+               Type = "XNOR";
+               break;
+            case 5:
+               Type = "XOR";
+               break;
+         }
+         if (CalculateValidities(ABCTruthValues[1], ABCTruthValues[2], Type) == ABCTruthValues[0] && BROperators[OperatorTrackers[2]] != BLOperators[OperatorTrackers[1]] && BROperators[OperatorTrackers[2]] != TMOperators[OperatorTrackers[0]]) {
+            Reroll = false;
+         }
+         yield return new WaitForSecondsRealtime(.1f);
+      }
+      Goose.OnInteract();
+   }
 }
