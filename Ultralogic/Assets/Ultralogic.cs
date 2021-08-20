@@ -237,6 +237,10 @@ public class Ultralogic : MonoBehaviour {
       if (parameters[0] == "submit") {
          SubmitPress();
       }
+      else if (!OperatorList.Join().Contains(parameters[2])) {
+         yield return "sendtochaterror I don't understand!";
+         yield break;
+      }
       else if (parameters[1] == "ab" || parameters[1] == "ba") {
          while (TMOperators[OperatorTrackers[0]] != Array.IndexOf(OperatorList, parameters[2])) {
             OperatorsButClickie[0].OnInteract();
