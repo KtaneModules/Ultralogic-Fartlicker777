@@ -226,16 +226,16 @@ public class Ultralogic : MonoBehaviour {
       string[] parameters = command.Split(' ');
       string[] OperatorList = { "and", "nand", "nor", "or", "xnor", "xor" };
       yield return null;
-      if (parameters.Length > 3 || (parameters.Length == 1 && parameters[0] != "submit")) {
+      if ((parameters.Length == 1 && parameters[0] == "submit")) {
+         SubmitPress();
+      }
+      if (parameters.Length != 3) {
          yield return "sendtochaterror I don't understand!";
          yield break;
       }
       if (parameters[0] != "set" && parameters[0] != "submit") {
          yield return "sendtochaterror I don't understand!";
          yield break;
-      }
-      if (parameters[0] == "submit") {
-         SubmitPress();
       }
       else if (!OperatorList.Join().Contains(parameters[2])) {
          yield return "sendtochaterror I don't understand!";
