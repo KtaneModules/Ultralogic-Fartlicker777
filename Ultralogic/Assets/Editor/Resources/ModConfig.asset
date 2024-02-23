@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "Wait a \u2588\u2588\u2588\u2588ing second... did we skip Hyperlogic?\r\n\nChange
     the operators so that the logic statements are true.\n\nManual can be found at
     ktane.timwi.de or in the manuals folder of the game.\n\nIf there are any bugs,
-    contact Fartlicker777 on Discord."
+    contact VFlyer on the KTANE Discord."
   version: 
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 254ed6caf3b1fe646b78c9af2ac8bb1d, type: 3}
